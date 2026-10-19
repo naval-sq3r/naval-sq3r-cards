@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="用 SQ3R 阅读法整理的《纳瓦尔宝典》50 张认知卡">
+  <title>《纳瓦尔宝典》· 50 张认知卡</title>
+  <style>
+    :root{
+      --paper:#f3eee6;--card:#fffdf9;--ink:#302d2a;--muted:#837b73;--line:#ded6cd;
+      --purple:#9a71c1;--purple-soft:#eee5f6;--blue:#68a7d5;--blue-soft:#e7f2fa;
+      --green:#67b88e;--green-soft:#e8f5ee;--orange:#e5a05c;--orange-soft:#fbefe3;
+      --pink:#d779a6;--pink-soft:#f8e9f0;--shadow:0 14px 40px rgba(76,60,45,.12);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif}
+    button,input,textarea{font:inherit}
+    button{color:inherit}
+    .shell{max-width:1160px;margin:auto;padding:54px 24px 80px}
+    .masthead{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end;margin-bottom:27px}
+    .eyebrow{font-size:12px;letter-spacing:.16em;color:var(--purple);font-weight:800;margin-bottom:12px}
+    h1{font-family:"Songti SC","STSong",serif;font-size:clamp(30px,4.8vw,56px);line-height:1.12;margin:0 0 12px;letter-spacing:-.03em}
+    .intro{margin:0;color:var(--muted);line-height:1.8;max-width:760px}
+    .count{font-family:Georgia,serif;font-size:70px;line-height:.85;color:rgba(154,113,193,.22);font-weight:700}
+    .toolbar{position:sticky;top:0;z-index:20;background:rgba(243,238,230,.91);backdrop-filter:blur(14px);padding:14px 0 18px;border-bottom:1px solid rgba(222,214,205,.8);margin-bottom:28px}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .search{width:min(310px,100%);height:44px;border:1px solid var(--line);border-radius:13px;background:var(--card);padding:0 15px;outline:none;box-shadow:0 3px 12px rgba(70,55,40,.04)}
+    .search:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-soft)}
+    .chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:9px 15px;cursor:pointer;transition:.2s;white-space:nowrap}
+    .chip:hover{transform:translateY(-1px);border-color:#c8b7d8}
+    .chip.active{color:#fff;background:var(--purple);border-color:var(--purple)}
+    .results{font-size:13px;color:var(--muted);margin:14px 2px 0}
+    .wall{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+    .card{position:relative;text-align:left;border:1px solid var(--line);border-left:6px solid var(--accent,var(--purple));border-radius:17px;background:rgba(255,253,249,.88);padding:20px 22px 20px;min-height:142px;cursor:pointer;box-shadow:0 5px 14px rgba(75,57,40,.045);transition:transform .22s,box-shadow .22s,border-color .22s;overflow:hidden}
+    .card::after{content:"↗";position:absolute;right:18px;top:16px;color:#b9afa7;font-size:16px;opacity:0;transform:translate(-5px,5px);transition:.22s}
+    .card:hover,.card:focus-visible{transform:translateY(-3px);box-shadow:0 12px 30px rgba(75,57,40,.1);border-color:#cfc3ba;outline:none}
+    .card:hover::after,.card:focus-visible::after{opacity:1;transform:none}
+    .meta{font-size:12px;font-weight:800;color:var(--accent,var(--purple));letter-spacing:.04em;margin-bottom:9px}
+    .card h2{font-family:"Songti SC","STSong",serif;font-size:22px;line-height:1.3;margin:0 28px 7px 0}
+    .card p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
+    .empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted)}
+    .modal[hidden]{display:none}
+    .modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(48,43,39,.46);backdrop-filter:blur(7px)}
+    .sheet{position:relative;width:min(720px,100%);max-height:92vh;overflow:auto;border-radius:24px;background-color:#fffdf9;background-image:radial-gradient(#e3dcd3 1px,transparent 1px);background-size:17px 17px;box-shadow:0 24px 80px rgba(33,27,23,.28);padding:34px 36px 26px}
+    .close{position:absolute;right:16px;top:15px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.9);font-size:20px;color:#7e746d;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.09)}
+    .sheet-head{padding-right:35px;margin-bottom:23px}
+    .tag{display:inline-flex;color:#fff;background:var(--purple);border-radius:7px;padding:6px 11px;font-size:12px;font-weight:800;margin-bottom:18px}
+    .sheet h2{font-family:"Songti SC","STSong",serif;font-size:clamp(29px,6vw,42px);line-height:1.15;margin:0 0 10px;display:inline;background:linear-gradient(transparent 55%,#fff0a6 55%);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+    .survey{font-size:15px;color:#6e6761;margin:14px 0 0;line-height:1.7}
+    .sq-row{display:grid;grid-template-columns:75px 1fr;gap:19px;margin:13px 0;border-left:4px solid var(--row);background:var(--soft);border-radius:13px;padding:18px 20px}
+    .sq-label{color:var(--row);font-size:12px;font-weight:800;line-height:1.35;align-self:center;text-align:center}
+    .sq-label b{display:block;font-size:17px;margin-bottom:4px}
+    .sq-content{font-size:15px;line-height:1.82;align-self:center}
+    .question{--row:var(--blue);--soft:var(--blue-soft)}
+    .read{--row:var(--green);--soft:var(--green-soft)}
+    .recite{--row:var(--orange);--soft:var(--orange-soft)}
+    .review{--row:var(--pink);--soft:var(--pink-soft)}
+    .review textarea{width:100%;min-height:86px;border:1px solid rgba(215,121,166,.28);border-radius:10px;background:rgba(255,255,255,.62);padding:11px 12px;resize:vertical;outline:none;line-height:1.6}
+    .review textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(215,121,166,.12)}
+    .saved{font-size:11px;color:#a8758d;margin-top:5px;min-height:15px}
+    .foot{display:flex;justify-content:space-between;gap:15px;margin-top:18px;color:#9c948d;font-size:11px}
+    .nav{display:flex;gap:8px}
+    .nav button{border:1px solid var(--line);background:rgba(255,255,255,.82);border-radius:9px;padding:7px 10px;cursor:pointer}
+    @media(max-width:720px){.shell{padding:34px 15px 60px}.masthead{grid-template-columns:1fr}.count{display:none}.wall{grid-template-columns:1fr}.toolbar{top:0}.search{width:100%}.sheet{padding:27px 18px 20px;border-radius:19px}.sq-row{grid-template-columns:55px 1fr;gap:12px;padding:16px 13px}.foot{align-items:center}.card{min-height:132px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <div class="eyebrow">THE ALMANACK OF NAVAL RAVIKANT</div>
+        <h1>《纳瓦尔宝典》· 50 张认知卡</h1>
+        <p class="intro">用 SQ3R 阅读法，把关于财富、决策、幸福与自我成长的洞见变成可提问、可复述、可复习的知识。点击任意卡片开始。</p>
+      </div>
+      <div class="count" aria-hidden="true">50</div>
+    </header>
+
+    <section class="toolbar" aria-label="卡片筛选">
+      <div class="controls">
+        <input class="search" id="search" type="search" placeholder="搜索卡名 / 关键词…" aria-label="搜索卡片">
+        <div id="filters" class="controls"></div>
+      </div>
+      <div class="results" id="results"></div>
+    </section>
+    <section class="wall" id="wall" aria-live="polite"></section>
+  </main>
+
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <article class="sheet" id="sheet">
+      <button class="close" id="close" aria-label="关闭">×</button>
+      <header class="sheet-head">
+        <span class="tag" id="modalTag"></span><br>
+        <h2 id="modalTitle"></h2>
+        <p class="survey" id="modalSurvey"></p>
+      </header>
+      <section class="sq-row question"><div class="sq-label"><b>Q</b>提问</div><div class="sq-content" id="modalQuestion"></div></section>
+      <section class="sq-row read"><div class="sq-label"><b>R</b>阅读</div><div class="sq-content" id="modalRead"></div></section>
+      <section class="sq-row recite"><div class="sq-label"><b>R</b>复述</div><div class="sq-content" id="modalRecite"></div></section>
+      <section class="sq-row review"><div class="sq-label"><b>R</b>复习</div><div class="sq-content"><textarea id="note" placeholder="用自己的话写下理解、例子或行动…"></textarea><div class="saved" id="saved"></div></div></section>
+      <footer class="foot"><span>Survey → Question → Read → Recite → Review</span><div class="nav"><button id="prev">← 上一张</button><button id="next">下一张 →</button></div></footer>
+    </article>
+  </div>
+
+  <script>
+    const categories={wealth:{label:'A 财富',color:'#9a71c1'},decision:{label:'B 决策',color:'#5e98c7'},happiness:{label:'C 幸福',color:'#d779a6'},learning:{label:'D 学习',color:'#67a887'},self:{label:'E 自我',color:'#df9852'},philosophy:{label:'F 哲学',color:'#7e7ab8'}};
+    const cards=[
+      ['wealth','睡后资产','让资产在你休息时继续创造价值','什么才算真正属于我的财富？','财富不是账户上的数字，而是无需持续出售时间，也能产生价值的资产。它可以是股权、软件、内容或能够自行运转的系统。','真正的财富能把收入与我的在线时间分开。','列出一项可以反复创造价值的资产。'],
+      ['wealth','赚钱是技能','把财富创造视为可以训练的能力','如果赚钱不是运气，我需要练习什么？','赚钱包含发现需求、创造价值、判断机会和组织资源等能力。能力可以通过长期实践和反馈逐步提升。','财富创造是一组可训练的能力。','本周刻意练习一项与创造价值有关的能力。'],
+      ['wealth','先选择方向','努力之前先找到值得投入的问题','我现在的努力指向真正重要的目标吗？','长时间忙碌不等于有效。先判断该做什么、与谁合作、何时行动，之后的努力才有放大作用。','方向决定努力是否会积累。','删掉一件低价值却长期占用时间的事。'],
+      ['wealth','长期游戏','与长期主义者建立持续合作','哪些人值得我合作十年？','信任会在重复合作中积累，摩擦成本会逐渐降低。长期关系让能力、信誉与成果获得复利。','长期的人际合作会形成信任复利。','给一位值得长期同行的人提供一次真实帮助。'],
+      ['wealth','复利人生','财富、关系与知识都依靠积累','我正在让什么持续复利？','复利来自小而正确的选择被重复足够久。频繁更换方向，会让每次积累都重新从零开始。','长期重复正确行动，微小优势也会变大。','选一件愿意坚持三年的小事。'],
+      ['wealth','正直合伙人','把品格放在聪明和精力之前','对方在没有监督时会如何选择？','聪明与精力能加速行动，正直决定行动的方向。与缺乏诚信的人合作，能力越强，潜在损失反而越大。','能力决定速度，正直决定终点。','回顾一次合作：对方是否言行一致？'],
+      ['wealth','创造并销售','同时掌握造物与传播的能力','我更需要补创造，还是补销售？','只会创造，价值可能无人知晓；只会销售，承诺缺少支撑。两者结合，才能持续把好产品送到需要它的人面前。','创造解决问题，销售连接需求。','为一个作品写一句清楚的价值说明。'],
+      ['wealth','独特知识','沿着好奇心建立难以替代的能力','什么事情对我像玩，对别人像工作？','独特知识往往来自天赋、兴趣与长期经历的交叉。它很难通过标准课程批量复制，也不容易被外包。','独特知识来自真实好奇与个人经历。','写下三件别人常来请教你的事。'],
+      ['wealth','兴趣胜过热点','热潮会变，好奇心能支撑长期学习','如果没有掌声，我还愿意研究什么？','追逐热点容易陷入同质竞争。真实兴趣能让你在漫长学习中保持耐心，最后形成别人难以追赶的深度。','兴趣让长期投入变得可持续。','安排一小时研究一个纯粹好奇的问题。'],
+      ['wealth','把自己产品化','让独特能力拥有规模化的载体','如何让我的能力服务更多人？','“自己”代表独特知识与责任，“产品化”代表复制与杠杆。将两者结合，能让个人能力突破时间上限。','找到独特能力，再为它装上可复制的载体。','把一项重复服务整理成模板或教程。'],
+      ['wealth','主动担责','用自己的名字承担风险与结果','我愿意公开为哪项成果负责？','清晰的责任会带来风险，也带来信誉、决策权与回报。躲在集体背后，很难建立可识别的个人判断。','责任让判断变得可见，也让回报更公平。','为当前项目明确写下自己负责的结果。'],
+      ['wealth','拥有股权','从出售时间走向分享长期增长','我的收入是否完全依赖工作时长？','工资购买的是一段时间，所有权分享的是系统的长期成果。要获得财务自由，需要拥有会成长的资产或事业份额。','时间收入有上限，所有权可以积累。','寻找一种低风险方式建立自己的资产。'],
+      ['wealth','代码与媒体','使用无需许可且可重复复制的杠杆','什么作品能在我离线时继续传播？','代码和媒体的边际复制成本接近零。一个人可以先创造一次，再让产品、文章或视频服务许多人。','可复制的作品能突破个人时间边界。','发布一个可被反复使用的小作品。'],
+      ['wealth','放大判断','杠杆把一次正确决策扩展到更大范围','我的判断经得起被放大吗？','杠杆本身没有方向，它会同时放大好判断和坏判断。因此，在增加资源与规模之前，要先提高判断质量。','先提高判断，再提高杠杆。','为一个重要决定写下依据与失败条件。'],
+      ['wealth','服务未知需求','提供社会想要却还不会获得的东西','人们有哪些尚未被满足的真实需求？','创新不是凭空制造欲望，而是看见已经存在的需求，并找到新的方式，以足够大的规模去满足它。','发现需求、创造方案、扩大交付。','观察一天中出现三次的同类麻烦。'],
+      ['decision','清晰胜过聪明','能说明白比显得高深更可靠','我能否把这个观点讲给孩子听？','清晰思考建立在基本概念和连续推理上。大量术语可能掩盖理解不足，简单表达则会暴露真正的逻辑。','能简单说明，通常才是真正理解。','用三句话解释当前最复杂的问题。'],
+      ['decision','回到第一原理','从可靠事实重新推导答案','哪些前提是事实，哪些只是习惯？','当现成答案不再适用，就把问题拆到最基本、可验证的事实，再从这些事实一步步重建结论。','拆掉未经验证的假设，从事实重建。','圈出计划里最关键的三个假设。'],
+      ['decision','基础优先','先掌握经得起推导的基本知识','我是在理解，还是在背诵术语？','高级概念容易制造懂了的错觉。牢固掌握数学、逻辑和基础规律，才能在忘记结论时重新推导。','可靠基础比零散高级知识更有用。','挑一个概念，从定义开始重新推导。'],
+      ['decision','愿望遮蔽事实','越想要某种结果，越要核查证据','我是否只在寻找支持自己的信息？','强烈愿望会选择性地过滤现实，让人忽略不利信号。把期待和观察分开，才能看见事情本来的样子。','欲望越强，证据审查越要严格。','为最想成功的方案写三条反面证据。'],
+      ['decision','痛苦提示真相','无法再否认现实时，改变才会开始','这份不适在提醒我面对什么？','痛苦常出现在愿望与现实碰撞的地方。它虽然难受，却能指出一直被回避的问题，成为修正方向的入口。','痛苦可能是现实发来的高强度信号。','写下最近一次挫折揭示的事实。'],
+      ['decision','缩小自我','减少维护身份，增加修正空间','如果不需要证明自己，我会怎么看？','自我会保护旧判断，因为承认错误像是在否定身份。把观点当作暂时模型，人就更容易根据事实更新。','观点可以改变，价值无需靠观点维持。','主动寻找一个能改变自己看法的证据。'],
+      ['decision','感受不是事实','情绪反映解释，而非完整现实','事实、解释和感受分别是什么？','情绪有信息价值，但它首先说明你如何估计事实。把三者拆开，可以避免在强烈情绪中仓促下结论。','尊重感受，同时核查事实。','把一件烦恼分成事实、解释、感受三栏。'],
+      ['decision','为空白留时间','好判断需要不被占满的注意力','我的日程还有思考的空间吗？','持续会议和输入会挤压深度思考。适度无聊与空白让信息沉淀，也让真正重要的问题浮现出来。','空白不是浪费，而是思考的基础设施。','每周预留两小时无会议思考时间。'],
+      ['decision','独立而不反对','独立思考不是习惯性唱反调','我的结论来自推理还是立场？','为了反对共识而反对，仍然被共识牵引。真正的独立是从事实出发，既能同意多数，也能承受不同意见。','独立来自推理，不来自反对姿态。','对一个观点先写最强支持理由再判断。'],
+      ['decision','乐观的异见者','看见问题，也相信问题能够解决','我能否提出比批评更好的方案？','犬儒主义容易获得聪明感，却很少创造新事物。稀缺的是能识别缺陷、仍愿意建设的人。','批评指出问题，建设创造可能。','把一条抱怨改写成可执行建议。'],
+      ['learning','从喜欢开始读','先爱上阅读，再追求阅读标准','什么内容让我愿意一直读下去？','阅读习惯比书单更重要。从真正喜欢的内容开始，持续阅读会自然把你带向更深、更难的主题。','先保持兴趣，再逐步提升难度。','放下卡住的书，换一本此刻想读的。'],
+      ['learning','好书慢慢读','阅读不是比赛，而是思想吸收','哪一页值得我停下来消化？','一本好书的价值不在翻页速度，而在它是否改变理解。停顿、重读与联想，都是阅读的一部分。','读得深比读得快更重要。','今天只精读一页并写一句启发。'],
+      ['learning','完成数是虚荣','读懂一个有预测力的新概念更重要','这本书真正改变了我什么？','完成书本数量容易统计，却未必等于学习。抓住最有解释力的核心观点后，放下一本书也是合理选择。','以认知变化衡量阅读，而非页数。','为最近一本书写下唯一核心观点。'],
+      ['learning','重读经典','重要的书会随阅历变化而变化','哪本书值得我再读一次？','读者变了，同一本书也会显出新的层次。少数高质量作品反复读，常比快速消费大量新书更有积累。','重读让知识从知道变成理解。','选择一本影响过你的书重读十页。'],
+      ['learning','用输出检验输入','教给别人会暴露理解的断点','我能不看资料讲清楚吗？','复述迫使大脑组织信息、补齐逻辑并发现模糊处。无法讲明白的地方，就是下一轮学习的入口。','输出是最诚实的理解测试。','录一段两分钟语音讲解今天所学。'],
+      ['learning','建立高质地基','先读基础、原典与经受时间检验的作品','我的世界观建立在哪些来源上？','早期输入会成为判断新知识的坐标。基础若不牢，后续信息越多，错误体系反而可能越完整。','知识地基决定后来理解的方向。','为一个领域找到一本公认的基础原典。'],
+      ['learning','成为学习机器','持续学习使人始终拥有选择','面对变化，我能多快学会新能力？','具体技能会过时，学习能力能不断迁移。保持好奇、掌握基础与快速实践，可以持续发现新的价值机会。','最耐用的能力，是获得新能力。','设计一个七天微型学习实验。'],
+      ['learning','谨慎选择输入','阅读的内容会悄悄塑造思维','我每天在给大脑喂什么？','反复接触的观念会形成默认联想，最终影响判断和情绪。选择输入，本质上是在选择未来的自己。','注意力投向哪里，心智就长向哪里。','取消一个低价值信息源。'],
+      ['learning','读原始资料','减少观点在转述中的损耗','我看到的是原文，还是别人的解释？','二手信息更省力，却带着转述者的选择和偏见。重要问题尽量接近原始材料，再形成自己的判断。','先看原始证据，再听他人结论。','为一个重要观点找到它的最初来源。'],
+      ['learning','古老问题找旧答案','问题越恒久，越值得参考经典','这个问题是新技术问题，还是人性问题？','新工具需要新说明；健康、关系、平静等古老问题，则常能从经受时间筛选的智慧中得到更稳健的答案。','按问题的年龄选择答案的年代。','为一个长期困扰寻找一份经典解答。'],
+      ['happiness','幸福可以训练','把幸福当作个性化的长期练习','哪些习惯让我的内心更安静？','幸福并非固定天赋。通过观察欲望、调整解释、照顾身体与练习接纳，每个人都能逐渐提高自己的幸福基线。','幸福是一项可以刻意培养的能力。','记录今天让自己平静的三个时刻。'],
+      ['happiness','幸福没有统一答案','亲自定义适合自己的满足','我说的幸福具体是什么感觉？','有人在心流中幸福，有人在关系或宁静中幸福。借用别人的定义，会把生活变成不属于自己的考卷。','幸福需要个人定义，也需要亲自验证。','完成句子：对我而言，幸福是……'],
+      ['happiness','没有缺失的时刻','当“不够”暂停，幸福会自然出现','此刻真的缺少什么，还是大脑在追逐？','心智习惯不断寻找缺口。短暂放下“还需要什么”，注意力回到当下，满足感便有机会显现。','幸福常在缺失感停止之后出现。','安静坐五分钟，不解决任何问题。'],
+      ['happiness','减少外在欲望','欲望越少，内在噪声越低','这个愿望值得用平静交换吗？','每个被设为“必须实现”的外在目标，都会让幸福附加一个条件。谨慎选择欲望，能释放大量注意力。','选择欲望，也是在选择不满足。','把愿望清单删到最重要的三项。'],
+      ['happiness','回到当下','过去与未来常是心智制造的噪声','现在这一分钟发生了什么？','反刍过去带来遗憾，过度投射未来带来焦虑。感受身体、环境与正在做的事，能让心智回到唯一可以行动的时刻。','当下是唯一能感受也能行动的地方。','下一顿饭不看屏幕，只体验味道。'],
+      ['happiness','别抓住快乐','试图固定快乐会让心再次紧张','我能允许好感受自然来去吗？','快乐是一种流动状态。一旦要求它永久保持，心智就开始监控和担忧，反而离开了当下。','享受快乐，不把快乐变成任务。','下次开心时，只感受而不分析。'],
+      ['happiness','平静先于快乐','稳定幸福更多来自接纳','什么是我无法控制却仍在对抗的？','外界永远有不确定。把注意力从控制一切转向接受可控边界，内心才能获得更稳定的空间。','幸福是平静的副产品，平静来自接纳。','把一件烦恼分为可控与不可控。'],
+      ['happiness','现实本身中性','痛苦常来自对现实的评判','如果不贴好坏标签，我看见什么？','现实只是在发生，心智才不断给它命名和评分。暂缓评判，并不等于放弃行动，而是先准确看见。','先观察，再评价；先接纳，再行动。','描述一件困扰，只写事实不写形容词。'],
+      ['happiness','珍惜有限时间','短暂生命不值得交给无尽追逐','如果时间很少，什么仍然重要？','生命的有限性让每一刻有了分量。真正珍惜时间，是把它留给健康、爱、创造与体验，而非无限延后的满足。','有限让选择变得清晰。','把本周一小时还给最重要的人或事。'],
+      ['self','欲望是契约','每个执念都在约定实现前不快乐','我正在与哪一个结果签订幸福契约？','目标可以指导行动，执念却规定“得不到就不能幸福”。识别这份隐形契约，才有机会重新选择。','可以追求目标，不必抵押当下的幸福。','把一个“必须”改写成“我愿意尝试”。'],
+      ['self','改变、离开或接纳','减少对现实无休止的内部争吵','这件事我能改变、能离开，还是要接纳？','面对长期不满，反复抱怨会消耗力量。明确选择行动、退出或接纳，能让注意力重新回到生活。','清晰选择比持续抱怨更有力量。','为一件困扰明确三选一，并写出下一步。'],
+      ['self','做独一无二的自己','无人能在成为你这件事上胜过你','哪些差异是我一直试图隐藏的？','模仿别人只能成为较弱的副本。承认自己的经历、偏好与能力组合，才能找到真正适合的位置。','独特性不是缺陷，而是方向线索。','写下一个曾被认为奇怪的优势。'],
+      ['self','照顾身体','平静的心需要健康身体承载','我是否把健康放在日程而非愿望里？','睡眠、运动与饮食会直接影响情绪和判断。身体并非事业之后再处理的项目，而是一切体验的基础。','身体状态决定许多心理状态的上限。','今天为睡眠做一个具体调整。'],
+      ['philosophy','降低自我重要性','不必要求宇宙配合个人剧本','这件事一年后还会如此重要吗？','把自己看得过于重要，会期待世界按个人意愿运转。拉远视角能降低控制欲，也让失败和冒犯回到合适的比例。','缩小自我，许多负担也会缩小。','用一年、十年尺度重看当前烦恼。'],
+      ['philosophy','理性地放下控制','把精力用于真正能够影响的部分','哪些结果根本不在我的控制范围？','平静不是消极，而是准确区分行动边界。对可控之事负责，对不可控之事停止内耗。','行动关注可控，心态接纳不可控。','为今天最担心的事画出控制圈。']
+    ].map((c,i)=>({id:i+1,category:c[0],title:c[1],survey:c[2],question:c[3],read:c[4],recite:c[5],review:c[6]}));
+
+    const wall=document.querySelector('#wall'),search=document.querySelector('#search'),filters=document.querySelector('#filters'),results=document.querySelector('#results');
+    const modal=document.querySelector('#modal'),sheet=document.querySelector('#sheet'),note=document.querySelector('#note'),saved=document.querySelector('#saved');
+    let activeCategory='all',currentId=null,lastFocus=null;
+
+    const esc=s=>s.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    const chip=(key,label)=>`<button class="chip ${key==='all'?'active':''}" data-filter="${key}">${label}</button>`;
+    filters.innerHTML=chip('all','全部')+Object.entries(categories).map(([k,v])=>chip(k,v.label)).join('');
+
+    function filteredCards(){const q=search.value.trim().toLowerCase();return cards.filter(c=>(activeCategory==='all'||c.category===activeCategory)&&(!q||[c.title,c.survey,c.question,c.read,c.recite].join(' ').toLowerCase().includes(q)))}
+    function render(){const list=filteredCards();results.textContent=`显示 ${list.length} / ${cards.length} 张卡片`;wall.innerHTML=list.length?list.map(c=>`<button class="card" data-id="${c.id}" style="--accent:${categories[c.category].color}"><div class="meta">${categories[c.category].label} · N${String(c.id).padStart(2,'0')}</div><h2>${esc(c.title)}</h2><p>${esc(c.survey)}</p></button>`).join(''):'<div class="empty">没有找到匹配的卡片，换个关键词试试。</div>'}
+    function openCard(id){const c=cards.find(x=>x.id===id);if(!c)return;currentId=id;lastFocus=document.activeElement;document.querySelector('#modalTag').textContent=`${categories[c.category].label} · N${String(c.id).padStart(2,'0')}`;document.querySelector('#modalTag').style.background=categories[c.category].color;document.querySelector('#modalTitle').textContent=c.title;document.querySelector('#modalSurvey').textContent='S · 概览｜'+c.survey;document.querySelector('#modalQuestion').textContent=c.question;document.querySelector('#modalRead').textContent=c.read;document.querySelector('#modalRecite').textContent=c.recite+' 试着合上卡片，用自己的话说一遍。';note.placeholder=c.review;note.value=localStorage.getItem('naval-card-note-'+id)||'';saved.textContent='';modal.hidden=false;document.body.style.overflow='hidden';sheet.scrollTop=0;document.querySelector('#close').focus()}
+    function closeCard(){modal.hidden=true;document.body.style.overflow='';lastFocus?.focus()}
+    function move(step){const list=filteredCards();let idx=list.findIndex(c=>c.id===currentId);if(idx<0)idx=0;openCard(list[(idx+step+list.length)%list.length].id)}
+    filters.addEventListener('click',e=>{const btn=e.target.closest('[data-filter]');if(!btn)return;activeCategory=btn.dataset.filter;filters.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x===btn));render()});
+    search.addEventListener('input',render);wall.addEventListener('click',e=>{const card=e.target.closest('[data-id]');if(card)openCard(Number(card.dataset.id))});
+    document.querySelector('#close').addEventListener('click',closeCard);document.querySelector('#prev').addEventListener('click',()=>move(-1));document.querySelector('#next').addEventListener('click',()=>move(1));
+    modal.addEventListener('click',e=>{if(e.target===modal)closeCard()});
+    note.addEventListener('input',()=>{localStorage.setItem('naval-card-note-'+currentId,note.value);saved.textContent='已自动保存在当前浏览器';clearTimeout(note._timer);note._timer=setTimeout(()=>saved.textContent='',1600)});
+    document.addEventListener('keydown',e=>{if(modal.hidden)return;if(e.key==='Escape')closeCard();if(e.key==='ArrowLeft'&&!['TEXTAREA','INPUT'].includes(document.activeElement.tagName))move(-1);if(e.key==='ArrowRight'&&!['TEXTAREA','INPUT'].includes(document.activeElement.tagName))move(1)});
+    render();
+  </script>
+</body>
+</html>
